@@ -98,12 +98,24 @@ int tst_kvcmp(const char *cur_kver, int r1, int r2, int r3)
 	return currver - testver;
 }
 
+/*
+ * wasixv2 implements current Linux semantics, but uname() reports its own
+ * ABI version, which would read as an ancient kernel. Compare it as newer
+ * than any kernel version a test asks for.
+ */
+#ifdef __wasixv2__
+# define WASIXV2_KVER "9999.0.0"
+#endif
+
 int tst_kvercmp(int r1, int r2, int r3)
 {
 	struct utsname uval;
 
 	uname(&uval);
 
+#ifdef __wasixv2__
+	return tst_kvcmp(WASIXV2_KVER, r1, r2, r3);
+#endif
 	return tst_kvcmp(uval.release, r1, r2, r3);
 }
 
@@ -175,6 +187,9 @@ int tst_kvercmp2(int r1, int r2, int r3, struct tst_kern_exv *vers)
 
 	uname(&uval);
 	kver = uval.release;
+#ifdef __wasixv2__
+	kver = WASIXV2_KVER;
+#endif
 	cur_dist_name = tst_kvcmp_distname(kver);
 
 	if (cur_dist_name == NULL)
