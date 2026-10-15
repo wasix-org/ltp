@@ -40,7 +40,7 @@
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
-#ifdef	__linux__
+#if defined(__linux__) || defined(__wasixv2__)
 #include <sys/vfs.h>
 #endif
 
@@ -67,7 +67,7 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 	len = page_size / 2;
 
 	PTS_GET_TMP_FILENAME(tmpfname, "pts_mmap_11_4");
-#ifdef	__linux__
+#if defined(__linux__) || defined(__wasixv2__)
 	struct statfs buf;
 
 	if (statfs(pts_get_tmpdir(), &buf)) {

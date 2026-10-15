@@ -240,7 +240,7 @@ struct list mnem[] = {
 	{"FTW_DNR", FTW_DNR},
 	{"FTW_NS", FTW_NS},
 	{"FTW_SL", FTW_SL},
-#ifndef __linux__
+#if !defined(__linux__) && !defined(__wasixv2__)
 /* How do we define __USE_XOPEN_EXTENDED ? Following depends on that */
 	{"FTW_DP", FTW_DP},
 	{"FTW_SLN", FTW_SLN},

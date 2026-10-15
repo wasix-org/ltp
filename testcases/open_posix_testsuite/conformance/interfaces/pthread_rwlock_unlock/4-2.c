@@ -56,7 +56,7 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 
 	pthread_t un_thread;
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__wasixv2__)
 	printf("Unlocking rwlock in different thread is undefined on Linux\n");
 	return PTS_UNSUPPORTED;
 #endif

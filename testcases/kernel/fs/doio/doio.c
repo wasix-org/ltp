@@ -443,7 +443,7 @@ struct aio_info *aio_slot(int aio_id);
 int aio_register(int fd, int strategy, int sig);
 int aio_unregister(int aio_id);
 
-#ifndef __linux__
+#if !defined(__linux__) && !defined(__wasixv2__)
 int aio_wait(int aio_id);
 #endif /* !__linux__ */
 
@@ -3324,7 +3324,7 @@ int do_rw(struct io_req *req)
 		/*
 		 * If the syscall was async, wait for I/O to complete
 		 */
-#ifndef __linux__
+#if !defined(__linux__) && !defined(__wasixv2__)
 		if (sy->sy_flags & SY_ASYNC) {
 			for (i = 0; i < nents; i++) {
 				aio_wait(s->aioid[i]);
@@ -3868,11 +3868,11 @@ int alloc_mem(int nbytes)
 	static int mturn = 0;	/* which memory type to use */
 	struct memalloc *M;
 	char filename[255];
-#ifdef __linux__
+#if defined(__linux__) || defined(__wasixv2__)
 	struct shmid_ds shm_ds;
 #endif
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__wasixv2__)
 	memset(&shm_ds, 0x00, sizeof(struct shmid_ds));
 #endif
 
@@ -4737,7 +4737,7 @@ int aio_unregister(int aio_id)
 	return 0;
 }
 
-#ifndef __linux__
+#if !defined(__linux__) && !defined(__wasixv2__)
 int aio_wait(int aio_id)
 {
 #ifdef RECALL_SIZEOF

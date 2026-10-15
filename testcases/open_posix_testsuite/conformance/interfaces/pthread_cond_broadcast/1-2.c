@@ -42,7 +42,7 @@
 #include <sys/mman.h>
 #include <sys/wait.h>
 #include <semaphore.h>
-#ifdef	__linux__
+#if defined(__linux__) || defined(__wasixv2__)
 #include <sys/sysinfo.h>
 #endif
 
@@ -256,7 +256,7 @@ static void *timer(void *arg PTS_ATTRIBUTE_UNUSED)
 	return NULL;		/* For compiler */
 }
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__wasixv2__)
 static void children_number(void)
 {
 	struct sysinfo sysinformation;

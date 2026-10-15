@@ -15,7 +15,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#ifdef __linux__
+#if defined(__linux__) || defined(__wasixv2__)
 #include <features.h>
 #endif
 #include <semaphore.h>

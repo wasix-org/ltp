@@ -110,7 +110,7 @@
 #include "test.h"
 #include "tso_safe_macros.h"
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__wasixv2__)
 /* glibc2.2 definition needs -D_XOPEN_SOURCE, which breaks other things. */
 extern int sighold(int __sig);
 extern int sigrelse(int __sig);

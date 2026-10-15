@@ -6,7 +6,7 @@
  * source tree.
  */
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__wasixv2__)
 #include <mntent.h>
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <sys/param.h>
@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include "posixtest.h"
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__wasixv2__)
 
 /*
  * Returns if prefix is prefix of a string and the length of prefix.

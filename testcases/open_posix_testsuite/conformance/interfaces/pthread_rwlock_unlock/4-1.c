@@ -31,7 +31,7 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 	static pthread_rwlock_t rwlock;
 	int rc;
 
-#if defined(__linux__) || defined(__NuttX__)
+#if (defined(__linux__) || defined(__wasixv2__)) || defined(__NuttX__)
 	printf("Unlocking uninitialized rwlock is undefined on this OS\n");
 	return PTS_UNSUPPORTED;
 #endif

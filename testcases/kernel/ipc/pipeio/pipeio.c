@@ -59,7 +59,7 @@ int TST_TOTAL = 1;
 
 #define SAFE_FREE(p) { if (p) { free(p); (p)=NULL; } }
 
-#if defined(__linux__)
+#if (defined(__linux__) || defined(__wasixv2__))
 #define NBPW sizeof(int)
 #endif
 

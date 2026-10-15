@@ -54,7 +54,7 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 	}
 
 	/* The overflow does not happen when 32bit binary runs on 64bit kernel */
-#ifdef __linux__
+#if defined(__linux__) || defined(__wasixv2__)
 	struct utsname buf;
 
 	if (!uname(&buf) && strstr(buf.machine, "64")) {

@@ -2226,7 +2226,7 @@ int /* BUG:14136 */ growfile(int fd, char *file, int grow_incr, char *buf,
 				return -1;
 			}
 #if NEWIO
-#if defined(sgi) || defined(__linux__)
+#if defined(sgi) || (defined(__linux__) || defined(__wasixv2__))
 			/* If this is POSIX I/O and it is via aio_{read,write}
 			 * or lio_listio then after completion of the I/O the
 			 * value of the file offset for the file is

@@ -23,7 +23,7 @@
  * Must be ported to OS's other than Linux
  */
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__wasixv2__)
 # define _GNU_SOURCE
 # include <sched.h>
 # include <stdio.h>

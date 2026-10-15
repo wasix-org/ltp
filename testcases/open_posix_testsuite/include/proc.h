@@ -15,7 +15,7 @@
 
 #include "posixtest.h"
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__wasixv2__)
 # include <errno.h>
 # include <string.h>
 
