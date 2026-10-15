@@ -107,7 +107,9 @@ extern volatile void *tst_futexes;
 extern unsigned int tst_max_futexes;
 
 static int ipc_fd;
+#ifndef __wasixv2__
 static char ipc_path[1064];
+#endif
 
 static char shm_path[1024];
 
@@ -137,6 +139,15 @@ static void setup_ipc(void)
 		free(tmpdir);
 	}
 
+#ifdef __wasixv2__
+	/*
+	 * wasixv2 cannot share memory between processes, and the test runs in
+	 * this process (see fork_testrun()), so private memory is enough.
+	 */
+	shm_path[0] = '\0';
+	ipc = SAFE_MMAP(NULL, size, PROT_READ | PROT_WRITE,
+			MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+#else
 	ipc_fd = open(shm_path, O_CREAT | O_EXCL | O_RDWR, 0600);
 	if (ipc_fd < 0)
 		tst_brk(TBROK | TERRNO, "open(%s)", shm_path);
@@ -147,6 +158,7 @@ static void setup_ipc(void)
 	ipc = SAFE_MMAP(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, ipc_fd, 0);
 
 	SAFE_CLOSE(ipc_fd);
+#endif
 
 	memset(ipc, 0, size);
 
@@ -160,6 +172,7 @@ static void setup_ipc(void)
 		tst_max_futexes = (size - offsetof(struct ipc_region, futexes)) / sizeof(futex_t);
 	}
 
+#ifndef __wasixv2__
 	/* Set environment variable for exec()'d children */
 	if (tst_test->needs_checkpoints || tst_test->child_needs_reinit) {
 		snprintf(ipc_path, sizeof(ipc_path), IPC_ENV_VAR "=%s", shm_path);
@@ -167,6 +180,7 @@ static void setup_ipc(void)
 	} else {
 		SAFE_UNLINK(shm_path);
 	}
+#endif
 }
 
 static void cleanup_ipc(void)
@@ -196,6 +210,13 @@ void tst_reinit(void)
 
 	if (ipc)
 		tst_brk(TBROK, "Test library already initialized!");
+
+#ifdef __wasixv2__
+	(void)path;
+	(void)size;
+	(void)fd;
+	tst_brk(TCONF, "wasixv2 cannot share memory between processes");
+#endif
 
 	if (!path)
 		tst_brk(TBROK, IPC_ENV_VAR" is not defined");
@@ -1806,6 +1827,10 @@ static void testrun(void)
 	}
 
 	do_test_cleanup();
+#ifdef __wasixv2__
+	/* The test runs in the library's process; fork_testrun() returns. */
+	return;
+#endif
 	exit(0);
 }
 
@@ -1922,6 +1947,21 @@ void tst_set_runtime(int runtime)
 static void fork_testrun(void)
 {
 	int status;
+
+#ifdef __wasixv2__
+	/*
+	 * wasixv2 has no fork in its default build configuration, and no memory
+	 * shared between processes for the results, so the test runs in this
+	 * process. Every test is its own process under the wasixv2 test runner,
+	 * so the isolation lost does not matter. A timeout ends the process.
+	 */
+	(void)status;
+	alarm(context->overall_time);
+	show_failure_hints = 1;
+	testrun();
+	alarm(0);
+	return;
+#endif
 
 	SAFE_SIGNAL(SIGINT, sigint_handler);
 	SAFE_SIGNAL(SIGTERM, sigint_handler);
