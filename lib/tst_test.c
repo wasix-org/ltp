@@ -111,6 +111,14 @@ static char ipc_path[1064];
 
 static char shm_path[1024];
 
+/*
+ * LTP_NO_FORK=1 runs the test in the test library process instead of a
+ * forked child, for systems without fork(). The results then need no shared
+ * memory, the library arms no alarm (the caller enforces the timeout), and
+ * tests that set .forks_child end with TCONF.
+ */
+static int no_fork;
+
 int TST_ERR;
 int TST_PASS;
 long TST_RET;
@@ -121,6 +129,26 @@ static void do_exit(int ret) __attribute__ ((noreturn));
 static void setup_ipc(void)
 {
 	size_t size = getpagesize();
+
+	/*
+	 * Without fork() only exec()'d children need the shared file: tests
+	 * that re-attach with tst_reinit().
+	 */
+	if (no_fork && !tst_test->child_needs_reinit) {
+		ipc = SAFE_MMAP(NULL, size, PROT_READ | PROT_WRITE,
+				MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+		memset(ipc, 0, size);
+		ipc->magic = LTP_MAGIC;
+		context = &ipc->context;
+		results = &ipc->results;
+		context->lib_pid = getpid();
+
+		if (tst_test->needs_checkpoints) {
+			tst_futexes = ipc->futexes;
+			tst_max_futexes = (size - offsetof(struct ipc_region, futexes)) / sizeof(futex_t);
+		}
+		return;
+	}
 
 	if (access("/dev/shm", F_OK) == 0) {
 		snprintf(shm_path, sizeof(shm_path), "/dev/shm/ltp_%s_%d",
@@ -1409,6 +1437,13 @@ bool tst_cmd_present(const char *cmd)
 	return false;
 }
 
+static int parse_bool_env(const char *name)
+{
+	const char *val = getenv(name);
+
+	return val && (!strcmp(val, "1") || !strcmp(val, "y"));
+}
+
 static void do_setup(int argc, char *argv[])
 {
 	char *tdebug_env = getenv("LTP_DEBUG");
@@ -1698,6 +1733,9 @@ static void heartbeat(void)
 	if (tst_clock_gettime(CLOCK_MONOTONIC, &context->start_time))
 		tst_res(TWARN | TERRNO, "tst_clock_gettime() failed");
 
+	if (no_fork)
+		return;
+
 	if (getppid() == 1) {
 		tst_res(TFAIL, "Main test process might have exit!");
 		/*
@@ -1774,7 +1812,7 @@ static void add_paths(void)
 	free(new_path);
 }
 
-static void testrun(void)
+static void do_testrun(void)
 {
 	unsigned int i = 0;
 	unsigned long long stop_time = 0;
@@ -1806,6 +1844,11 @@ static void testrun(void)
 	}
 
 	do_test_cleanup();
+}
+
+static void testrun(void)
+{
+	do_testrun();
 	exit(0);
 }
 
@@ -1919,9 +1962,25 @@ void tst_set_runtime(int runtime)
 	heartbeat();
 }
 
+static void inprocess_testrun(void)
+{
+	show_failure_hints = 1;
+	test_pid = getpid();
+
+	do_testrun();
+
+	/* The library's own tst_brk() must not run the test's cleanup again. */
+	context->main_pid = 0;
+}
+
 static void fork_testrun(void)
 {
 	int status;
+
+	if (no_fork) {
+		inprocess_testrun();
+		return;
+	}
 
 	SAFE_SIGNAL(SIGINT, sigint_handler);
 	SAFE_SIGNAL(SIGTERM, sigint_handler);
@@ -2058,11 +2117,18 @@ void tst_run_tcases(int argc, char *argv[], struct tst_test *self)
 
 	tst_test = self;
 
-	do_setup(argc, argv);
-	tst_enable_oom_protection(context->lib_pid);
+	no_fork = parse_bool_env("LTP_NO_FORK");
 
-	SAFE_SIGNAL(SIGALRM, alarm_handler);
-	SAFE_SIGNAL(SIGUSR1, heartbeat_handler);
+	do_setup(argc, argv);
+
+	if (no_fork && tst_test->forks_child)
+		tst_brk(TCONF, "Test forks, and LTP_NO_FORK is set");
+
+	if (!no_fork) {
+		tst_enable_oom_protection(context->lib_pid);
+		SAFE_SIGNAL(SIGALRM, alarm_handler);
+		SAFE_SIGNAL(SIGUSR1, heartbeat_handler);
+	}
 
 	tst_res(TINFO, "LTP version: "LTP_VERSION);
 
