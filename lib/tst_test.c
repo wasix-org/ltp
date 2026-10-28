@@ -1693,6 +1693,8 @@ static void do_cleanup(void)
 	cleanup_ipc();
 }
 
+static void heartbeat_handler(int sig);
+
 static void heartbeat(void)
 {
 	if (tst_clock_gettime(CLOCK_MONOTONIC, &context->start_time))
@@ -1702,9 +1704,12 @@ static void heartbeat(void)
 	/*
 	 * The test runs in the library's process (see fork_testrun()), so there
 	 * is no main process to lose, and its parent may well be init. The
-	 * timeout the heartbeat extends is this process's own.
+	 * timeout the heartbeat extends is this process's own, so it is
+	 * extended here directly: a SIGUSR1 into the test's own process would
+	 * reach the test's SIGUSR1 handler, on any of its threads, where
+	 * upstream's test process never sees one.
 	 */
-	kill(getpid(), SIGUSR1);
+	heartbeat_handler(SIGUSR1);
 	return;
 #endif
 
@@ -2096,7 +2101,13 @@ void tst_run_tcases(int argc, char *argv[], struct tst_test *self)
 	tst_enable_oom_protection(context->lib_pid);
 
 	SAFE_SIGNAL(SIGALRM, alarm_handler);
+	/*
+	 * On wasixv2 the heartbeat extends the timeout directly, and SIGUSR1 keeps
+	 * its default action, as in upstream's test process.
+	 */
+#ifndef __wasixv2__
 	SAFE_SIGNAL(SIGUSR1, heartbeat_handler);
+#endif
 
 	if (tst_test->min_runtime && !tst_test->runtime)
 		tst_test->runtime = tst_test->min_runtime;
