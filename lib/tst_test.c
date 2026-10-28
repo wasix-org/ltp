@@ -1719,6 +1719,16 @@ static void heartbeat(void)
 	if (tst_clock_gettime(CLOCK_MONOTONIC, &context->start_time))
 		tst_res(TWARN | TERRNO, "tst_clock_gettime() failed");
 
+#ifdef __wasixv2__
+	/*
+	 * The test runs in the library's process (see fork_testrun()), so there
+	 * is no main process to lose, and its parent may well be init. The
+	 * timeout the heartbeat extends is this process's own.
+	 */
+	kill(getpid(), SIGUSR1);
+	return;
+#endif
+
 	if (getppid() == 1) {
 		tst_res(TFAIL, "Main test process might have exit!");
 		/*
