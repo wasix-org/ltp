@@ -141,12 +141,15 @@ static void setup_ipc(void)
 
 #ifdef __wasixv2__
 	/*
-	 * wasixv2 cannot share memory between processes, and the test runs in
-	 * this process (see fork_testrun()), so private memory is enough.
+	 * The test runs in this process (see fork_testrun()), so only the
+	 * children it forks need the region: shared anonymous memory reaches
+	 * them, with its checkpoint futexes and the results they report.
+	 * Nothing is exec()'d with the region (see tst_reinit()), so no file
+	 * is needed.
 	 */
 	shm_path[0] = '\0';
 	ipc = SAFE_MMAP(NULL, size, PROT_READ | PROT_WRITE,
-			MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 #else
 	ipc_fd = open(shm_path, O_CREAT | O_EXCL | O_RDWR, 0600);
 	if (ipc_fd < 0)
