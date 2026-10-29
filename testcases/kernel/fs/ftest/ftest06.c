@@ -396,11 +396,16 @@ static void fussdir(int me, int count)
  */
 #define	THING(p)	{p, "p"}
 
+static void sync_files(int me LTP_ATTRIBUTE_UNUSED, int count LTP_ATTRIBUTE_UNUSED)
+{
+	sync();
+}
+
 struct ino_thing {
-	void (*it_proc) ();
+	void (*it_proc)(int, int);
 	char *it_name;
 } ino_thing[] = {
-THING(crfile), THING(unlfile), THING(fussdir), THING(sync),};
+THING(crfile), THING(unlfile), THING(fussdir), THING(sync_files),};
 
 #define	NTHING	ARRAY_SIZE(ino_thing)
 
@@ -417,7 +422,7 @@ static void dotest(int me, int count)
 
 	for (i = 0; i < count; i++) {
 		thing = (rand() >> 3) % NTHING;
-		(*ino_thing[thing].it_proc) (me, i, ino_thing[thing].it_name);
+		(*ino_thing[thing].it_proc)(me, i);
 		++thing_cnt[thing];
 	}
 

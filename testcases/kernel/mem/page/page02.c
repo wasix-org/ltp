@@ -75,12 +75,12 @@ char *argv[];
 	int *memory_pointer;
 	int *up_pointer, *down_pointer;
 	int child, count;
-	int chld();
+	void chld(int);
 
 	parent_pid = getpid();
 	tst_tmpdir();
 
-	if (signal(SIGUSR1, (void (*)())chld) == SIG_ERR) {
+	if (signal(SIGUSR1, chld) == SIG_ERR) {
 		tst_resm(TBROK, "signal failed");
 		exit(1);
 	}
@@ -227,11 +227,11 @@ char *str;
 	tst_brkm(TCONF, NULL, "\tCannot parse %s as a number.", str);
 }
 
-int chld()
+void chld(int sig LTP_ATTRIBUTE_UNUSED)
 {
-	if (signal(SIGUSR1, (void (*)())chld) == SIG_ERR) {
+	if (signal(SIGUSR1, chld) == SIG_ERR) {
 		tst_brkm(TBROK, NULL, "signal failed");
 	}
 	chld_flag++;
-	return 0;
+	return;
 }

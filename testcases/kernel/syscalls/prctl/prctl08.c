@@ -34,13 +34,13 @@
 
 #define PROC_TIMERSLACK_PATH "/proc/self/timerslack_ns"
 
-static void check_reset_timerslack(char *message);
+static void check_reset_timerslack(char *message, unsigned long value);
 static void check_get_timerslack(char *message, unsigned long value);
 static void check_inherit_timerslack(char *message, unsigned long value);
 static unsigned long origin_value;
 
 static struct tcase {
-	void (*func_check)();
+	void (*func_check)(char *, unsigned long);
 	unsigned long setvalue;
 	unsigned long expvalue;
 	char message[50];
@@ -54,7 +54,7 @@ static struct tcase {
 
 static int proc_flag = 1;
 
-static void check_reset_timerslack(char *message)
+static void check_reset_timerslack(char *message, unsigned long value LTP_ATTRIBUTE_UNUSED)
 {
 	check_get_timerslack(message, origin_value);
 }
