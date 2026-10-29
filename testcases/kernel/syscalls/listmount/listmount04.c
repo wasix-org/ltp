@@ -41,7 +41,7 @@ static struct tcase {
 	uint64_t param;
 	uint64_t *mnt_ids;
 	size_t nr_mnt_ids;
-	uint64_t flags;
+	unsigned int flags;
 	int exp_errno;
 	char *msg;
 	int kver;
