@@ -31,7 +31,9 @@ static int libc_msgctl(int msqid, int cmd, void *buf)
 
 static int sys_msgctl(int msqid, int cmd, void *buf)
 {
-	return tst_syscall(__NR_msgctl, msqid, cmd, buf);
+	/* musl's IPC_STAT bit 0x100 selects libc's time64 conversion, not a
+	 * command accepted by Linux ipc/msg.c:sys_msgctl. */
+	return tst_syscall(__NR_msgctl, msqid, cmd & ~(IPC_STAT & 0x100), buf);
 }
 
 struct tcase {

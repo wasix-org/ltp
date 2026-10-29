@@ -49,7 +49,9 @@ static int libc_shmctl(int shmid, int cmd, void *buf)
 
 static int sys_shmctl(int shmid, int cmd, void *buf)
 {
-	return tst_syscall(__NR_shmctl, shmid, cmd, buf);
+	/* musl's IPC_STAT bit 0x100 is a libc time64 marker; Linux
+	 * ipc/shm.c:sys_shmctl takes the underlying command. */
+	return tst_syscall(__NR_shmctl, shmid, cmd & ~(IPC_STAT & 0x100), buf);
 }
 
 static struct tcase {

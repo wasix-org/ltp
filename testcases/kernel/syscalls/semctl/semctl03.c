@@ -41,7 +41,10 @@ static int sys_semctl(int semid, int semnum, int cmd, ...)
 	va_start(ap, cmd);
 	arg = va_arg(ap, union semun);
 	va_end(ap);
-	return tst_syscall(__NR_semctl, semid, semnum, cmd, arg);
+	/* Linux ipc/sem.c:sys_semctl takes an unsigned long, not a union.
+	 * Wasm passes aggregates indirectly, including through varargs. */
+	return tst_syscall(__NR_semctl, semid, semnum,
+		cmd & ~(IPC_STAT & 0x100), arg.buf);
 }
 
 static struct tcases {
@@ -72,13 +75,15 @@ static void verify_semctl(unsigned int n)
 {
 	struct tcases *tc = &tests[n];
 	struct test_variants *tv = &variants[tst_variant];
+	/* The variadic wrappers consume a union, which Wasm passes indirectly. */
+	union semun semarg = {.buf = *(tc->buf)};
 
 	if (tc->error == EFAULT && tv->semctl == libc_semctl) {
 		tst_res(TCONF, "EFAULT is skipped for libc variant");
 		return;
 	}
 
-	TST_EXP_FAIL(tv->semctl(*(tc->sem_id), 0, tc->ipc_cmd, *(tc->buf)),
+	TST_EXP_FAIL(tv->semctl(*(tc->sem_id), 0, tc->ipc_cmd, semarg),
 		tc->error, "semctl() with %s", tc->message);
 }
 
