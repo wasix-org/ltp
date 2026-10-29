@@ -56,7 +56,7 @@ static struct timeval before_wait, after_wait;
 #define TIMEOUT 5
 
 /* Signal handler called by the thread when SIGUSR1 is received */
-static void sig_handler()
+static void sig_handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 
 	if (pthread_equal(pthread_self(), sig_thread)) {

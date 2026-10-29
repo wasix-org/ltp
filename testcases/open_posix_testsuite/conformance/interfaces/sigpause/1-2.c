@@ -32,13 +32,13 @@
 
 static int returned;
 
-static void handler()
+static void handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	printf("signal was called\n");
 	return;
 }
 
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	struct sigaction act;
 	act.sa_flags = 0;

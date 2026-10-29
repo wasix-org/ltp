@@ -24,7 +24,7 @@
 
 static int end_exec;
 
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	int i;
 

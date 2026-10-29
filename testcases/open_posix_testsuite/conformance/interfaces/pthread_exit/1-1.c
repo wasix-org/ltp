@@ -31,7 +31,7 @@
 static int sem;			/* Manual semaphore used to indicate when the thread has been created. */
 
 /* Thread's function. */
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	sem = INMAIN;
 	pthread_exit((void *)RETURN_CODE);

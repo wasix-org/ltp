@@ -30,7 +30,7 @@
 
 static stack_t alternate_s, original_s;
 
-static void handler()
+static void handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 
 	stack_t handler_s;

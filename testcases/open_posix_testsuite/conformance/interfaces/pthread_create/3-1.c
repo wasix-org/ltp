@@ -32,7 +32,7 @@
 
 static volatile int sem;
 
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	sem = 1;
 

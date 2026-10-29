@@ -33,7 +33,7 @@
 
 static int sem1;			/* Manual semaphore */
 
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 
 	/* Indicate to test_main() that the thread was created. */

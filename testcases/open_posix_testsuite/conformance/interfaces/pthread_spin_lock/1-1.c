@@ -35,7 +35,7 @@ static volatile int thread_state;
 #define EXITING_THREAD 3
 #define GET_SPIN_LOCK 4
 
-static void sig_handler()
+static void sig_handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	/* Just return */
 	pthread_exit(0);

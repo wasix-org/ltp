@@ -49,7 +49,7 @@ static void *an_init_func()
 }
 
 /* Thread function */
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	/* Make the thread cancelable immediately */
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);

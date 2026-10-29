@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include "posixtest.h"
 
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	struct sched_param sparam;
 	int policy, priority, policy_1;

@@ -30,7 +30,7 @@
 
 static sigset_t th_pendingset, th_sigmask;
 
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	pthread_sigmask(SIG_SETMASK, NULL, &th_sigmask);
 

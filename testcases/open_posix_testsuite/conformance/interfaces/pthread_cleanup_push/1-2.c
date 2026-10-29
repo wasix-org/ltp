@@ -48,7 +48,7 @@ static void a_cleanup_func(void *flag_val)
 }
 
 /* Function that the thread executes upon its creation */
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);

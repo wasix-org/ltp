@@ -23,7 +23,7 @@
 #include <string.h>
 #include "posixtest.h"
 
-static void sig_handler()
+static void sig_handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	printf("main: interrupted by SIGALARM\n");
 	printf

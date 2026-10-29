@@ -41,7 +41,7 @@ static void handler(int signo PTS_ATTRIBUTE_UNUSED)
 	handler_called = 1;
 }
 
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 
 	struct sigaction act;

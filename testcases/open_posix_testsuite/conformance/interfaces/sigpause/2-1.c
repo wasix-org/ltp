@@ -45,14 +45,14 @@ static int handler_called;
 static int return_value = 2;
 static int sem = INMAIN;
 
-static void handler()
+static void handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	printf("signal was called\n");
 	handler_called = 1;
 	return;
 }
 
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	struct sigaction act;
 	sigset_t pendingset;

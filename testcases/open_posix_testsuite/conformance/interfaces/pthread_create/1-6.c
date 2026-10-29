@@ -49,7 +49,7 @@
 static volatile sig_atomic_t flag;
 static int n_threads;
 
-static void alarm_handler()
+static void alarm_handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	flag = 0;
 }

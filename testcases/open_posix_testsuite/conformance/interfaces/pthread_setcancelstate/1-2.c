@@ -35,7 +35,7 @@ static int sem1;			/* Manual semaphore */
 static int cancel_flag;
 
 /* Function that the thread executes upon its creation */
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	/* Set cancel state to DISABLE, meaning it shouldn't honor any cancel requests. */
 	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);

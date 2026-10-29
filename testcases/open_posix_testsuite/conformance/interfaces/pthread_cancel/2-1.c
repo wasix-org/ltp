@@ -28,7 +28,7 @@ static int cleanup_flag;		/* Made global so that the cleanup function
 
 /* A cleanup function that sets the cleanup_flag to 1, meaning that the
  * cleanup function was reached. */
-static void a_cleanup_func()
+static void a_cleanup_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	cleanup_flag = 1;
 	sem = 0;
@@ -40,7 +40,7 @@ static void a_cleanup_func()
  * loop, never reaching the cleanup_pop function.  So the only way the cleanup
  * function can be called is when the thread is canceled and all the cleanup
  * functions are supposed to be popped. */
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	/* To enable thread immediate cancelation, since the default
 	 * is PTHREAD_CANCEL_DEFERRED. */

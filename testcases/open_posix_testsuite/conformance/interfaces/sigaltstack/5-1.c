@@ -18,7 +18,7 @@
 
 #define SIGTOTEST SIGUSR1
 
-static void handler()
+static void handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	printf("Do nothing useful\n");
 }

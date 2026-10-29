@@ -31,13 +31,13 @@
 static int result = 2;
 static int sem = INTHREAD;
 
-static void handler()
+static void handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	printf("signal was called\n");
 	return;
 }
 
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	int return_value = 0;
 	struct sigaction act;

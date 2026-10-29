@@ -28,7 +28,7 @@
 
 static volatile int thread_created = 0;
 
-static void *thread_func()
+static void *thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	thread_created = 1;
 	pthread_exit(0);

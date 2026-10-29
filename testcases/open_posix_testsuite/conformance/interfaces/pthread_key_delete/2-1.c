@@ -40,7 +40,7 @@ static void dest_func(void *p PTS_ATTRIBUTE_UNUSED)
 }
 
 /* Thread function */
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 
 	/* Set the value of the key to a value */

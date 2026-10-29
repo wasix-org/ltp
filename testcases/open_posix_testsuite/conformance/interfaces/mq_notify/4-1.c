@@ -35,7 +35,7 @@
 
 static int enter_handler = 0;
 
-static void msg_handler()
+static void msg_handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	enter_handler = 1;
 }

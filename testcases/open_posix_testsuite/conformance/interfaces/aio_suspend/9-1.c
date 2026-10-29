@@ -42,7 +42,8 @@
 
 static sig_atomic_t received_all;
 
-static void sigrt1_handler()
+static void sigrt1_handler(int sig PTS_ATTRIBUTE_UNUSED, siginfo_t *info PTS_ATTRIBUTE_UNUSED,
+			   void *context PTS_ATTRIBUTE_UNUSED)
 {
 	received_all = 1;
 }

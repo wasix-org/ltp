@@ -53,7 +53,7 @@ static void a_cleanup_func3(void *flag_val PTS_ATTRIBUTE_UNUSED)
 }
 
 /* Function that the thread executes upon its creation */
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	pthread_cleanup_push(a_cleanup_func1, NULL);
 	pthread_cleanup_push(a_cleanup_func2, NULL);

@@ -31,7 +31,7 @@ static int get_rand()
 	return r;
 }
 
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 
 	int r = get_rand();

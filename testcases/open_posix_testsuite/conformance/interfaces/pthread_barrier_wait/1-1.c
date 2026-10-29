@@ -53,7 +53,7 @@ static void *fn_chld(void *arg PTS_ATTRIBUTE_UNUSED)
 	return NULL;
 }
 
-static void sig_handler()
+static void sig_handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	printf("Interrupted by SIGALRM\n");
 	printf("Test FAILED: main blocked on barrier wait\n");

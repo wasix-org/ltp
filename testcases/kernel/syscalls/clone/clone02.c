@@ -74,7 +74,7 @@ static void setup(void);
 static int test_setup(void);
 static void cleanup(void);
 static void test_cleanup(void);
-static int child_fn();
+static int child_fn(void *arg);
 static int parent_test1(void);
 static int parent_test2(void);
 static int test_VM(void);
@@ -86,7 +86,7 @@ static int modified_FS(void);
 static int modified_FILES(void);
 static int modified_SIG(void);
 static void sig_child_defined_handler(int);
-static void sig_default_handler();
+static void sig_default_handler(int sig);
 
 static int fd_parent;
 static char file_name[25];
@@ -98,7 +98,7 @@ char *TCID = "clone02";
 
 struct test_case_t {
 	int flags;
-	int (*parent_fn) ();
+	int (*parent_fn)(void);
 } test_cases[] = {
 	{
 	FLAG_ALL, parent_test1}, {
@@ -250,7 +250,7 @@ static void test_cleanup(void)
 
 }
 
-static int child_fn(void)
+static int child_fn(void *arg LTP_ATTRIBUTE_UNUSED)
 {
 
 	/* save child pid */
@@ -459,6 +459,6 @@ static void sig_child_defined_handler(int pid)
 }
 
 /* sig_default_handler() - Default handler for parent */
-static void sig_default_handler(void)
+static void sig_default_handler(int sig LTP_ATTRIBUTE_UNUSED)
 {
 }

@@ -43,7 +43,7 @@ static pthread_rwlock_t rwlock;
 static int thread_state;
 static int handler_called;
 
-static void sig_handler()
+static void sig_handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	if (pthread_equal(pthread_self(), sig_thread)) {
 		printf("sig_handler: handled signal SIGUSR1\n");

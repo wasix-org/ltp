@@ -30,7 +30,7 @@
 #define ERROR_PREFIX "unexpected error: " FUNCTION " " TEST ": "
 
 static const long int policy = SCHED_FIFO;
-static void *thread_func()
+static void *thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	int rc;
 	int new_policy;

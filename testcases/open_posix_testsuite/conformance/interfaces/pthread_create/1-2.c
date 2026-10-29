@@ -22,7 +22,7 @@
 #include <string.h>
 #include "posixtest.h"
 
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	sleep(10);
 

@@ -43,7 +43,7 @@
 
 static volatile sig_atomic_t called = 0;
 
-static void handler()
+static void handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	called = 1;
 }

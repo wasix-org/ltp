@@ -39,7 +39,7 @@ static int sig_rcvd;
 #define ENTERED_THREAD 2
 #define EXITING_THREAD 3
 
-static void sig_handler()
+static void sig_handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	sig_rcvd = 1;
 	printf("thread: interrupted by SIGUSR1\n");

@@ -29,7 +29,7 @@
 
 #define STACKADDROFFSET 0x8000000
 
-static void *thread_func()
+static void *thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	pthread_exit(0);
 	return NULL;

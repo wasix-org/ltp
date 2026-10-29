@@ -46,7 +46,7 @@ static void destructor(void *tmp PTS_ATTRIBUTE_UNUSED)
 /*
    Cleanup Handler for the Thread
  */
-static void cleanup_function()
+static void cleanup_function(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	clock_gettime(CLOCK_REALTIME, &cleanup_time);
 	cleanup_flag = 1;

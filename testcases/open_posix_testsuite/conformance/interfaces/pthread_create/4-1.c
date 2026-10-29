@@ -22,7 +22,7 @@
 #include <string.h>
 #include "posixtest.h"
 
-static void *a_thread_func();
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED);
 static pthread_t self_th;
 
 int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
@@ -53,7 +53,7 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 	return PTS_PASS;
 }
 
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	self_th = pthread_self();
 	return NULL;

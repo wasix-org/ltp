@@ -28,7 +28,7 @@
 
 static stack_t altstack1;
 
-static void handler()
+static void handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	printf("Just a dummy handler\n");
 }

@@ -39,7 +39,7 @@ static int teststack()
 	return 0;
 }
 
-static void *thread_func()
+static void *thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	/* execute a function to test the read/right of the stack */
 	if (teststack() != 0) {

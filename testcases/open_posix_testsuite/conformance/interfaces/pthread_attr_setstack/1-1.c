@@ -32,7 +32,7 @@
 static void *stack_addr;
 static size_t stack_size;
 
-static void *thread_func()
+static void *thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	pthread_exit(0);
 	return NULL;

@@ -35,12 +35,12 @@ static int cleanup_flag;
  * Cleanup function that the thread executes when it is canceled.  So if
  * cleanup_flag is 1, it means that the thread was canceled.
  */
-static void a_cleanup_func()
+static void a_cleanup_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	cleanup_flag = 1;
 }
 
-static void *a_thread_func()
+static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	int err;
 

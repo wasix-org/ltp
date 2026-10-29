@@ -54,7 +54,7 @@ static int handler_state;
 static int expired;
 static struct timeval before_wait, after_wait;
 
-static void sig_handler()
+static void sig_handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 
 	struct timespec sleep_time_req;

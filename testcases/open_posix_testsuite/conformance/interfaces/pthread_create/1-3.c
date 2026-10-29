@@ -27,8 +27,8 @@
 #include <string.h>
 #include "posixtest.h"
 
-static void *a_thread_function();
-static void alarm_handler();
+static void *a_thread_function(void *arg PTS_ATTRIBUTE_UNUSED);
+static void alarm_handler(int sig PTS_ATTRIBUTE_UNUSED);
 
 static pthread_t a;
 
@@ -62,7 +62,7 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 }
 
 /* A never-ending thread function */
-static void *a_thread_function()
+static void *a_thread_function(void *arg PTS_ATTRIBUTE_UNUSED)
 {
 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
@@ -73,7 +73,7 @@ static void *a_thread_function()
 }
 
 /* If this handler is called, that means that the test has failed. */
-static void alarm_handler()
+static void alarm_handler(int sig PTS_ATTRIBUTE_UNUSED)
 {
 	PTS_WRITE_MSG("Test FAILED: Alarm fired while waiting for cancelation\n");
 	_exit(PTS_FAIL);
