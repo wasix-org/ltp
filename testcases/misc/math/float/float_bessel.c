@@ -34,7 +34,7 @@ const TH_FUNC th_func[] = {
 	 ""},
 	{FUNC_NORMAL, 30, y1, "y1", "y1_inp.ref", "y1_out.ref2",
 	 ""},
-	{FUNC_GAM, 30, lgamma, "lgamma", "gamma_inp.ref", "gamma_out.ref",
+	{FUNC_NORMAL, 30, lgamma, "lgamma", "gamma_inp.ref", "gamma_out.ref",
 	 "gamma_sign.ref"}
 };
 
