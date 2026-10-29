@@ -30,7 +30,7 @@ static void run(void)
 	wqueue_add_key(fd);
 
 	keyctl(KEYCTL_CLEAR, KEY_SPEC_SESSION_KEYRING);
-	wqueue_consumer(fd, saw_key_cleared);
+	wqueue_key_consumer(fd, saw_key_cleared);
 
 	SAFE_CLOSE(fd);
 }

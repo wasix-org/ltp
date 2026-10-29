@@ -31,7 +31,7 @@ static void run(void)
 	key = wqueue_add_key(fd);
 
 	keyctl(KEYCTL_INVALIDATE, key);
-	wqueue_consumer(fd, saw_key_invalidated);
+	wqueue_key_consumer(fd, saw_key_invalidated);
 
 	SAFE_CLOSE(fd);
 }
