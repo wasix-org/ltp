@@ -32,7 +32,7 @@ static int init_flag;
 static pthread_once_t once_control = PTHREAD_ONCE_INIT;
 
 /* The init function that pthread_once calls */
-static void *an_init_func()
+static void an_init_func(void)
 {
 	/* Indicate to test_main() that the init function has been reached */
 	init_flag = 1;
@@ -45,7 +45,7 @@ static void *an_init_func()
 	perror
 	    ("Init function timed out (10 secs), thread could not be canceled\n");
 	init_flag = -1;
-	return NULL;
+	return;
 }
 
 /* Thread function */
@@ -54,16 +54,16 @@ static void *a_thread_func(void *arg PTS_ATTRIBUTE_UNUSED)
 	/* Make the thread cancelable immediately */
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
-	pthread_once(&once_control, (void *)an_init_func);
+	pthread_once(&once_control, an_init_func);
 	return NULL;
 }
 
 /* 2nd init function used by the 2nd call of pthread_once */
-static void *an_init_func2()
+static void an_init_func2(void)
 {
 	/* Indicate to test_main() that this init function has been reached */
 	init_flag = 1;
-	return NULL;
+	return;
 }
 
 int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
@@ -101,7 +101,7 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 
 	/* Should be able to call pthread_once() again with the same
 	 * pthread_once_t object. */
-	pthread_once(&once_control, (void *)an_init_func2);
+	pthread_once(&once_control, an_init_func2);
 
 	/* If the init function from the 2nd call to pthread_once() was not
 	 * reached, the test fails. */

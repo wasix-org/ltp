@@ -60,7 +60,7 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 
 	/* If we get here, call sig_handler() to check the return code of
 	 * pthread_spin_lock() */
-	sig_handler();
+	sig_handler(0);
 
 	/* Unlock spinlock */
 	pthread_spin_unlock(&spinlock);
