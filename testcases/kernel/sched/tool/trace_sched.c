@@ -55,6 +55,10 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <string.h>
+#include "test.h"
+
+char *TCID = "trace_sched";
+int TST_TOTAL = 1;
 
 void noprintf(char *string, ...)
 {
@@ -307,11 +311,9 @@ int main(int argc,		/* number of input parameters.                        */
 	thread_sched_t **args_table;	/* pointer table of arguments address         */
 	thread_sched_t **status_table;	/*pointer table of status address          */
 
-	if (getuid() != 0) {
-		fprintf(stderr,
-			"ERROR: Only root user can run this program.\n");
-		usage(argv[0]);
-	}
+	/* Declare the requirement through LTP's standard old-API helper so
+	 * launchers can determine the required credentials before execution. */
+	tst_require_root();
 
 	if (argc < 2) {
 		fprintf(stderr,
