@@ -1525,11 +1525,8 @@ static void do_setup(int argc, char *argv[])
 	if (tst_test->hugepages.number)
 		tst_reserve_hugepages(&tst_test->hugepages);
 
-#ifndef __wasixv2__
-	/* On wasixv2 every test run allocates its own, see fork_testrun(). */
 	if (tst_test->bufs)
 		tst_buffers_alloc(tst_test->bufs);
-#endif
 
 	if (needs_tmpdir() && !tst_tmpdir_created())
 		tst_tmpdir();
@@ -1696,25 +1693,10 @@ static void do_cleanup(void)
 	cleanup_ipc();
 }
 
-static void heartbeat_handler(int sig);
-
 static void heartbeat(void)
 {
 	if (tst_clock_gettime(CLOCK_MONOTONIC, &context->start_time))
 		tst_res(TWARN | TERRNO, "tst_clock_gettime() failed");
-
-#ifdef __wasixv2__
-	/*
-	 * The test runs in the library's process (see fork_testrun()), so there
-	 * is no main process to lose, and its parent may well be init. The
-	 * timeout the heartbeat extends is this process's own, so it is
-	 * extended here directly: a SIGUSR1 into the test's own process would
-	 * reach the test's SIGUSR1 handler, on any of its threads, where
-	 * upstream's test process never sees one.
-	 */
-	heartbeat_handler(SIGUSR1);
-	return;
-#endif
 
 	if (getppid() == 1) {
 		tst_res(TFAIL, "Main test process might have exit!");
@@ -1824,10 +1806,6 @@ static void testrun(void)
 	}
 
 	do_test_cleanup();
-#ifdef __wasixv2__
-	/* The test runs in the library's process; fork_testrun() returns. */
-	return;
-#endif
 	exit(0);
 }
 
@@ -1944,30 +1922,6 @@ void tst_set_runtime(int runtime)
 static void fork_testrun(void)
 {
 	int status;
-
-#ifdef __wasixv2__
-	/*
-	 * wasixv2 has no fork in its default build configuration, so the test
-	 * runs in this process. Every test is its own process under the wasixv2
-	 * test runner, so the isolation lost does not matter. A timeout ends the
-	 * process.
-	 */
-	(void)status;
-	alarm(context->overall_time);
-	show_failure_hints = 1;
-	/*
-	 * Upstream allocates the guarded buffers once in the library process,
-	 * and every test run (variant, filesystem) gets a pristine copy in its
-	 * forked child, which frees only that copy on cleanup. Here the run's
-	 * cleanup frees the buffers in this process, so every run allocates
-	 * its own.
-	 */
-	if (tst_test->bufs)
-		tst_buffers_alloc(tst_test->bufs);
-	testrun();
-	alarm(0);
-	return;
-#endif
 
 	SAFE_SIGNAL(SIGINT, sigint_handler);
 	SAFE_SIGNAL(SIGTERM, sigint_handler);
@@ -2113,13 +2067,7 @@ void tst_run_tcases(int argc, char *argv[], struct tst_test *self)
 	tst_enable_oom_protection(context->lib_pid);
 
 	SAFE_SIGNAL(SIGALRM, alarm_handler);
-	/*
-	 * On wasixv2 the heartbeat extends the timeout directly, and SIGUSR1 keeps
-	 * its default action, as in upstream's test process.
-	 */
-#ifndef __wasixv2__
 	SAFE_SIGNAL(SIGUSR1, heartbeat_handler);
-#endif
 
 	if (tst_test->min_runtime && !tst_test->runtime)
 		tst_test->runtime = tst_test->min_runtime;

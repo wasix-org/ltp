@@ -7,6 +7,7 @@
 # TODO TWARN: test_guarded_buf test14 tst_capability01 tst_print_result
 LTP_C_API_TESTS="${LTP_C_API_TESTS:-
 test_children_cleanup.sh
+test_fork_isolation
 test_kconfig.sh
 test_kconfig03
 test_parse_filesize
