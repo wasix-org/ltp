@@ -75,7 +75,15 @@ static void run_test(unsigned int nr)
 	struct test_case *tc = &tcases[nr];
 
 	TST_EXP_FAIL(tst_syscall(__NR_sync_file_range, *(tc->fd),
+#ifdef __wasm__
+		/* Linux fs/sync.c:sync_file_range takes two loff_t arguments.
+		 * WASIX's syscall dispatcher consumes low/high 32-bit slots;
+		 * an off_t in Wasm varargs has different alignment. */
+		(long)tc->offset, (long)((uint64_t)tc->offset >> 32),
+		(long)tc->nbytes, (long)((uint64_t)tc->nbytes >> 32), tc->flags), tc->error,
+#else
 		tc->offset, tc->nbytes, tc->flags), tc->error,
+#endif
 		"sync_file_range(%i, %li, %li, %i)",
 		*(tc->fd), (long)tc->offset, (long)tc->nbytes, tc->flags);
 }

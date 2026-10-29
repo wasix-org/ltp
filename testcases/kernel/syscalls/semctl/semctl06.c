@@ -325,6 +325,8 @@ static void term(int sig)
 
 void setup(void)
 {
+	/* ipc/util.c:ipcperms requires CAP_IPC_OWNER for our mode-000 sets. */
+	tst_require_root();
 	tst_sig(FORK, DEF_HANDLER, cleanup);
 
 	TEST_PAUSE;
