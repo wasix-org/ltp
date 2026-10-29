@@ -1525,8 +1525,11 @@ static void do_setup(int argc, char *argv[])
 	if (tst_test->hugepages.number)
 		tst_reserve_hugepages(&tst_test->hugepages);
 
+#ifndef __wasixv2__
+	/* On wasixv2 every test run allocates its own, see fork_testrun(). */
 	if (tst_test->bufs)
 		tst_buffers_alloc(tst_test->bufs);
+#endif
 
 	if (needs_tmpdir() && !tst_tmpdir_created())
 		tst_tmpdir();
@@ -1952,6 +1955,15 @@ static void fork_testrun(void)
 	(void)status;
 	alarm(context->overall_time);
 	show_failure_hints = 1;
+	/*
+	 * Upstream allocates the guarded buffers once in the library process,
+	 * and every test run (variant, filesystem) gets a pristine copy in its
+	 * forked child, which frees only that copy on cleanup. Here the run's
+	 * cleanup frees the buffers in this process, so every run allocates
+	 * its own.
+	 */
+	if (tst_test->bufs)
+		tst_buffers_alloc(tst_test->bufs);
 	testrun();
 	alarm(0);
 	return;
