@@ -120,7 +120,7 @@ static inline int wqueue_watch(int buf_size,
 typedef void (*wqueue_callback)(struct watch_notification *n, size_t len,
 				unsigned int wtype);
 
-static void wqueue_consumer(int fd, wqueue_callback cb)
+static unsigned int wqueue_read(int fd, wqueue_callback cb, int skip_removal)
 {
 	unsigned char buffer[433], *p, *end;
 	union {
@@ -128,10 +128,13 @@ static void wqueue_consumer(int fd, wqueue_callback cb)
 		unsigned char buf1[128];
 	} n;
 	ssize_t buf_len;
+	unsigned int consumed = 0;
 
 	tst_res(TINFO, "Reading watch queue events");
 
 	buf_len = SAFE_READ(0, fd, buffer, sizeof(buffer));
+	if (!buf_len)
+		tst_brk(TBROK, "Queue closed before the expected notification");
 
 	p = buffer;
 	end = buffer + buf_len;
@@ -154,10 +157,36 @@ static void wqueue_consumer(int fd, wqueue_callback cb)
 		if (len < sizeof(n.n) || len > largest)
 			tst_brk(TBROK, "Bad message length: %zu/%zu", len, largest);
 
-		cb(&n.n, len, n.n.type);
+		/* security/keys/gc.c:key_gc_unused_keys removes watches through
+		 * kernel/watch_queue.c:remove_watch_from_object. A key test can
+		 * read that valid meta record before or after its key event.
+		 */
+		if (skip_removal && n.n.type == WATCH_TYPE_META &&
+		    n.n.subtype == WATCH_META_REMOVAL_NOTIFICATION) {
+			if (len != sizeof(struct watch_notification) &&
+			    len != sizeof(struct watch_notification_removal))
+				tst_brk(TBROK, "Incorrect removal message length: %zu", len);
+		} else {
+			cb(&n.n, len, n.n.type);
+			consumed++;
+		}
 
 		p += len;
 	}
+
+	return consumed;
+}
+
+static void wqueue_consumer(int fd, wqueue_callback cb)
+{
+	wqueue_read(fd, cb, 0);
+}
+
+/* Still require a key event when a read contains only GC removals. */
+static void wqueue_key_consumer(int fd, wqueue_callback cb)
+{
+	while (!wqueue_read(fd, cb, 1))
+		continue;
 }
 
 #endif
