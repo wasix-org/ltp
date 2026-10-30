@@ -62,8 +62,13 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 		return PTS_UNRESOLVED;
 	}
 
-	/* Map the file for the first time, to get a legal address, pa */
-	pa = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	/* Reserve two pages so pa+1 with a one-page length stays in range.
+	 * Linux mm/mmap.c:__get_unmapped_area checks TASK_SIZE before alignment. */
+	pa = mmap(NULL, 2 * size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	if (pa == MAP_FAILED) {
+		close(fd);
+		return PTS_UNRESOLVED;
+	}
 
 	if ((unsigned long)pa % page_size) {
 		printf("pa is not multiple of page_size\n");
@@ -73,7 +78,7 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 		illegal_addr = pa + 1;
 	}
 
-	munmap(pa, size);
+	munmap(pa, 2 * size);
 
 	/* Mmap again using the illegal address, setting MAP_FIXED */
 	pa = mmap(illegal_addr, size, PROT_READ | PROT_WRITE, MAP_FIXED, fd, 0);
