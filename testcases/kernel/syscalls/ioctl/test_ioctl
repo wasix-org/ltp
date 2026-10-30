@@ -23,6 +23,10 @@ export TCID=ioctl01_02
 export TST_TOTAL=2
 export TST_COUNT=0
 
+. test.sh
+tst_require_root
+found=0
+
 has_tty()
 {
     if command -v stty >/dev/null 2>&1; then
@@ -34,7 +38,7 @@ has_tty()
     return 1
 }
 
-for tttype in `ls /dev/tty*`
+for tttype in /dev/tty*
 do
 device_no=${tttype#/dev/tty}
 case "$device_no" in
@@ -44,6 +48,7 @@ case "$device_no" in
         tst_resm TINFO "Skipping ioctl02 with $tttype"
         continue
     fi
+    found=1
     tst_resm TINFO "Testing ioctl02 with $tttype"
     ioctl02 -d $tttype
     RC=$?
@@ -56,5 +61,8 @@ case "$device_no" in
 echo;;
 esac
 done
+if [ "$found" -eq 0 ]; then
+    tst_resm TCONF "No accessible numeric virtual terminal devices"
+fi
 tst_exit
 
