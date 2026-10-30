@@ -27,7 +27,7 @@ static futex_t *unmapped_addr;
 static futex_t *prot_none_addr;
 
 static struct futex_test_variants variants[] = {
-#if (__NR_futex != __LTP__NR_INVALID_SYSCALL)
+#if (__NR_futex != __LTP__NR_INVALID_SYSCALL && __NR_futex != __NR_futex_time64)
 	{ .fntype = FUTEX_FN_FUTEX, .desc = "syscall with old kernel spec"},
 #endif
 
