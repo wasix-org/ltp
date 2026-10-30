@@ -57,7 +57,7 @@ do_test()
 
 	for i in $(seq 1 $NUMLOOPS); do
 
-		if ! ping$TST_IPV6 -q -c1 $(tst_ipaddr rhost) -I $(tst_iface) > /dev/null; then
+		if ! ping$TST_IPV6 -q -c1 -I $(tst_iface) $(tst_ipaddr rhost) > /dev/null; then
 			tst_res TFAIL "cannot ping $(tst_ipaddr rhost)"
 			return
 		fi

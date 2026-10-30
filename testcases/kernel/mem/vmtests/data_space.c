@@ -103,8 +103,8 @@ int argc;
 char *argv[];
 {
 	int i = 1;
-	int term();
-	int chld();
+	void term(int);
+	void chld(int);
 
 	prog = argv[0];
 
@@ -134,10 +134,10 @@ char *argv[];
 
 	parent_pid = getpid();
 
-	if (sigset(SIGTERM, (void (*)())term) == SIG_ERR) {
+	if (sigset(SIGTERM, term) == SIG_ERR) {
 		tst_brkm(TBROK, NULL, "first sigset failed");
 	}
-	if (sigset(SIGUSR1, (void (*)())chld) == SIG_ERR) {
+	if (sigset(SIGUSR1, chld) == SIG_ERR) {
 		tst_brkm(TBROK, NULL, "sigset shichld");
 	}
 
@@ -447,7 +447,7 @@ register int size;
  *	Parent - kill kids and return when signal arrives.
  *	Child - exit.
  */
-int term()
+void term(int sig LTP_ATTRIBUTE_UNUSED)
 {
 #ifdef DEBUG
 	tst_resm(TINFO, "\tterm -[%d]- got sig term.\n", getpid());
@@ -455,20 +455,20 @@ int term()
 
 	if (parent_pid == getpid()) {
 		massmurder();
-		return 0;
+		return;
 	}
 
 	exit(0);
 }
 
-int chld()
+void chld(int sig LTP_ATTRIBUTE_UNUSED)
 {
-	if (sigset(SIGUSR1, (void (*)())chld) == SIG_ERR) {
+	if (sigset(SIGUSR1, chld) == SIG_ERR) {
 		tst_resm(TBROK, "sigset shichld");
 		exit(1);
 	}
 	chld_flag++;
-	return 0;
+	return;
 }
 
 int massmurder()

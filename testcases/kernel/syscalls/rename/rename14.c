@@ -58,8 +58,8 @@ int TST_TOTAL = 1;
 int kidpid[2];
 int parent_pid;
 
-int term(void);
-int al(void);
+void term(int sig);
+void al(int sig);
 void dochild1(void);
 void dochild2(void);
 
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 	tst_parse_opts(argc, argv, NULL, NULL);
 
 	sigemptyset(&set);
-	act.sa_handler = (void (*)())term;
+	act.sa_handler = term;
 	act.sa_mask = set;
 	act.sa_flags = 0;
 	if (sigaction(SIGTERM, &act, &oact)) {
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 	}
 
 	sigemptyset(&set);
-	act.sa_handler = (void (*)())al;
+	act.sa_handler = al;
 	act.sa_mask = set;
 	act.sa_flags = 0;
 	if (sigaction(SIGALRM, &act, 0)) {
@@ -128,24 +128,32 @@ int main(int argc, char *argv[])
 	tst_exit();
 }
 
-int term(void)
+void term(int sig LTP_ATTRIBUTE_UNUSED)
 {
 	if (parent_pid != getpid())
 		exit(0);
-	if (kidpid[0])
-		return (kill(kidpid[0], SIGTERM));
-	if (kidpid[1])
-		return (kill(kidpid[1], SIGTERM));
-	return 0;
+	if (kidpid[0]) {
+		kill(kidpid[0], SIGTERM);
+		return;
+	}
+	if (kidpid[1]) {
+		kill(kidpid[1], SIGTERM);
+		return;
+	}
+	return;
 }
 
-int al(void)
+void al(int sig LTP_ATTRIBUTE_UNUSED)
 {
-	if (kidpid[0])
-		return (kill(kidpid[0], SIGTERM));
-	if (kidpid[1])
-		return (kill(kidpid[1], SIGTERM));
-	return 0;
+	if (kidpid[0]) {
+		kill(kidpid[0], SIGTERM);
+		return;
+	}
+	if (kidpid[1]) {
+		kill(kidpid[1], SIGTERM);
+		return;
+	}
+	return;
 }
 
 void dochild1(void)
