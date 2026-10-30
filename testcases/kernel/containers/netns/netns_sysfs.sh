@@ -1,4 +1,6 @@
 #!/bin/sh
+# Linux namespace/capability operations below require privileged initial credentials.
+TST_NEEDS_ROOT=1
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (c) Köry Maincent <kory.maincent@bootlin.com> 2020
 # Copyright (c) 2015 Red Hat, Inc.
