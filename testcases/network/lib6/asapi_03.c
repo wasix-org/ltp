@@ -381,5 +381,8 @@ static void do_tests(void)
 
 static void setup(void)
 {
+	/* Linux net/ipv6/af_inet6.c inet6_create requires CAP_NET_RAW. */
+	tst_require_root();
+
 	TEST_PAUSE;
 }
