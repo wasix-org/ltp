@@ -1,4 +1,6 @@
 #!/bin/sh
+# Linux namespace/capability operations below require privileged initial credentials.
+TST_NEEDS_ROOT=1
 ################################################################################
 ##                                                                            ##
 ## Copyright (c) International Business Machines  Corp., 2008                 ##

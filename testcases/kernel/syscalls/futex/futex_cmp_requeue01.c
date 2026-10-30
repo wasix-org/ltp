@@ -44,7 +44,7 @@ static struct tcase {
 };
 
 static struct futex_test_variants variants[] = {
-#if (__NR_futex != __LTP__NR_INVALID_SYSCALL)
+#if (__NR_futex != __LTP__NR_INVALID_SYSCALL && __NR_futex != __NR_futex_time64)
 	{ .fntype = FUTEX_FN_FUTEX, .tstype = TST_KERN_OLD_TIMESPEC, .desc = "syscall with old kernel spec"},
 #endif
 

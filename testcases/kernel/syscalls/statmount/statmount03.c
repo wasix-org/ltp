@@ -123,6 +123,8 @@ static void cleanup(void)
 }
 
 static struct tst_test test = {
+	/* kernel/nsproxy.c:check_unshare_flags requires CAP_SYS_ADMIN for CLONE_NEWNS. */
+	.needs_root = 1,
 	.test = run,
 	.tcnt = ARRAY_SIZE(tcases),
 	.setup = setup,

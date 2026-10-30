@@ -34,6 +34,8 @@ TST_TOTAL=1
 TST_COUNT=1
 TST_CLEANUP=do_cleanup
 TST_USE_LEGACY_API=1
+# Two rounds: 30s bogus-interface helper + 20 * (5 + 5)s + 60s drain = 580s.
+TST_TIMEOUT=600
 
 setup()
 {

@@ -96,7 +96,7 @@ static int parent_process(char *qname, int read_pipe, int write_pipe,
 	pid_t child_pid PTS_ATTRIBUTE_UNUSED)
 {
 	mqd_t queue;
-	struct sigevent se;
+	struct sigevent se = {0};
 	int rval;
 	char reply;
 
@@ -156,7 +156,7 @@ static int parent_process(char *qname, int read_pipe, int write_pipe,
 static int child_process(char *qname, int read_pipe, int write_pipe)
 {
 	mqd_t queue;
-	struct sigevent se;
+	struct sigevent se = {0};
 	char reply;
 	int rval;
 
@@ -176,7 +176,9 @@ static int child_process(char *qname, int read_pipe, int write_pipe)
 		return PTS_UNRESOLVED;
 	}
 	// try notify while parent still has queue open - should fail
+	/* Linux ipc/mqueue.c:do_mq_notify validates signo before checking EBUSY. */
 	se.sigev_notify = SIGEV_SIGNAL;
+	se.sigev_signo = SIGUSR1;
 	if (!mq_notify(queue, &se)) {
 		puts(ERROR_PREFIX "mq_notify (2): " "should have failed");
 		return PTS_UNRESOLVED;
@@ -193,7 +195,7 @@ static int child_process(char *qname, int read_pipe, int write_pipe)
 	}
 	// try notify after parent closed queue - should succeed
 	se.sigev_notify = SIGEV_SIGNAL;
-	se.sigev_signo = 0;
+	se.sigev_signo = SIGUSR1;
 	rval = mq_notify(queue, &se);
 
 	// send 'd' for success and 'e' for failure

@@ -27,10 +27,14 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 {
 
 	char semname[28];
+	int ret;
 
-	sem_unlink(semname);
+	/* Linux fs/namei.c:do_unlinkat returns ENOENT for an absent name. */
+	sprintf(semname, "/" FUNCTION "_" TEST "_%d", getpid());
+	errno = 0;
+	ret = sem_unlink(semname);
 
-	if (errno == ENOENT) {
+	if (ret == -1 && errno == ENOENT) {
 		puts("TEST PASSED");
 		return PTS_PASS;
 	} else {

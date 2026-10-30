@@ -26,6 +26,10 @@ enum futex_fn_type {
 	FUTEX_FN_FUTEX64,
 };
 
+/* musl may alias __NR_futex to __NR_futex_time64. When equal, do not add
+ * an old-timespec variant: Linux scripts/syscall.tbl maps futex_time64 to
+ * sys_futex (kernel/futex/syscalls.c:SYSCALL_DEFINE6(futex)), which takes
+ * struct __kernel_timespec, not the time32 layout. */
 struct futex_test_variants {
 	enum futex_fn_type fntype;
 	enum tst_ts_type tstype;
