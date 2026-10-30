@@ -15,6 +15,7 @@
  */
 
 #include <stdio.h>
+#include <sys/prctl.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -79,6 +80,11 @@ static void child_alloc(const int *sizes, int nr_iovecs)
 	}
 
 	tst_res(TINFO, "child_alloc: memory allocated and initialized");
+
+	/* Yama's ptracer_exception_found permits the declared parent's descendants,
+	 * including the copying sibling (security/yama/yama_lsm.c). */
+	if (prctl(PR_SET_PTRACER, (unsigned long)getppid(), 0UL, 0UL, 0UL) && errno != EINVAL)
+		tst_brk(TBROK | TERRNO, "PR_SET_PTRACER parent");
 
 	TST_CHECKPOINT_WAKE_AND_WAIT(0);
 }

@@ -13,6 +13,7 @@
  */
 
 #include <stdio.h>
+#include <sys/prctl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "tst_test.h"
@@ -28,6 +29,11 @@ static void child_alloc(const char *data)
 	*data_ptr = (uintptr_t)foo;
 
 	tst_res(TINFO, "child 0: memory allocated and initialized");
+
+	/* Yama's ptracer_exception_found permits the declared parent's descendants,
+	 * including the copying sibling (security/yama/yama_lsm.c). */
+	if (prctl(PR_SET_PTRACER, (unsigned long)getppid(), 0UL, 0UL, 0UL) && errno != EINVAL)
+		tst_brk(TBROK | TERRNO, "PR_SET_PTRACER parent");
 
 	/* wake and wait until child_invoke is done reading from our VM */
 	TST_CHECKPOINT_WAKE_AND_WAIT(0);
