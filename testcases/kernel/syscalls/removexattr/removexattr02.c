@@ -53,7 +53,9 @@ static struct test_case {
 	/* test2 */
 	{"", "user.test", ENOENT},
 	/* test3 */
-	{(char *)-1, "user.test", EFAULT}
+	/* fs/namei.c:getname_flags faults on NULL. On wasm32 the last byte
+	 * may be mapped, so -1 can instead name a valid empty string. */
+	{NULL, "user.test", EFAULT}
 };
 
 static void verify_removexattr(struct test_case *tc);
